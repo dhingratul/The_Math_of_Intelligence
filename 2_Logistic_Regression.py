@@ -60,21 +60,21 @@ def catch_singularity(f):
 @catch_singularity
 def newton_step(curr, X, lam=None):
     '''One naive step of Newton's Method'''
-    p = np.array(sigmoid(X.dot(curr[:,0])), ndmin=2).T
-    W = np.diag((p*(1-p))[:,0])
-    #derive the hessian
+    p = np.array(sigmoid(X.dot(curr[:, 0])), ndmin=2).T
+    W = np.diag((p * (1 - p))[:, 0])
+    # derive the hessian
     hessian = X.T.dot(W).dot(X)
-    #derive the gradient
-    grad = X.T.dot(y-p)
+    # derive the gradient
+    grad = X.T.dot(y - p)
 
-    ## regularization step (avoiding overfitting)
+    # regularization step (avoiding overfitting)
     if lam:
         # Return the least-squares solution to a linear matrix equation
         step, *_ = np.linalg.lstsq(hessian + lam*np.eye(curr.shape[0]), grad)
     else:
         step, *_ = np.linalg.lstsq(hessian, grad)
 
-    ## update our
+    # update our
     beta = curr + step
 
     return beta
@@ -84,56 +84,56 @@ def newton_step(curr, X, lam=None):
 def alt_newton_step(curr, X, lam=None):
     '''One naive step of Newton's Method'''
 
-    ## compute necessary objects
-    p = np.array(sigmoid(X.dot(curr[:,0])), ndmin=2).T
-    W = np.diag((p*(1-p))[:,0])
+    # compute necessary objects
+    p = np.array(sigmoid(X.dot(curr[:, 0])), ndmin=2).T
+    W = np.diag((p * (1 - p))[:, 0])
     hessian = X.T.dot(W).dot(X)
     grad = X.T.dot(y-p)
 
-    ## regularization
+    # regularization
     if lam:
-        #Compute the inverse of a matrix.
+        # Compute the inverse of a matrix.
         step = np.dot(np.linalg.inv(hessian + lam*np.eye(curr.shape[0])), grad)
     else:
         step = np.dot(np.linalg.inv(hessian), grad)
 
-    ## update our weights
+    # update our weights
     beta = curr + step
 
     return beta
 
 
-
 def check_coefs_convergence(beta_old, beta_new, tol, iters):
     '''Checks whether the coefficients have converged in the l-infinity norm.
     Returns True if they have converged, False otherwise.'''
-    #calculate the change in the coefficients
+    # calculate the change in the coefficients
     coef_change = np.abs(beta_old - beta_new)
 
-    #if change hasn't reached the threshold and we have more iterations to go, keep training
-    return not (np.any(coef_change>tol) & (iters < max_iter))
+    # if change hasn't reached the threshold and we have more iterations to go,
+    # keep training
+    return not (np.any(coef_change > tol) & (iters < max_iter))
 
 
-## Driver
-#initial coefficients (weight values), 2 copies, we'll update one
-beta_old, beta = np.ones((len(X.columns),1)), np.zeros((len(X.columns),1))
+# Driver Program
+# initial coefficients (weight values), 2 copies, we'll update one
+beta_old, beta = np.ones((len(X.columns), 1)), np.zeros((len(X.columns), 1))
 
-#num iterations we've done so far
+# num iterations we've done so far
 iter_count = 0
-#have we reached convergence?
+# have we reached convergence?
 coefs_converged = False
 
-#if we haven't reached convergence... (training step)
+# if we haven't reached convergence... (training step)
 while not coefs_converged:
-
-    #set the old coefficients to our current
+    # set the old coefficients to our current
     beta_old = beta
-    #perform a single step of newton's optimization on our data, set our updated beta values
+    # perform a single step of newton's optimization on our data, set our
+    # updated beta values
     beta = newton_step(beta, X, lam=lam)
-    #increment the number of iterations
+    # increment the number of iterations
     iter_count += 1
 
-    #check for convergence between our old and new beta values
+    # check for convergence between our old and new beta values
     coefs_converged = check_coefs_convergence(beta_old, beta, tol, iter_count)
 
 print('Iterations : {}'.format(iter_count))
