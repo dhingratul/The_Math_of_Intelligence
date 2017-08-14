@@ -8,7 +8,6 @@ Created on Thu Aug  3 15:36:19 2017
 
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 
 
 def load_dataset(name):
@@ -41,7 +40,7 @@ def kmeans(k, epsilon=0, distance='euclidian'):
         # for each instance in the dataset
         for index_instance, instance in enumerate(dataset):
             # define a distance vector of size k
-            dist_vec = np.zeros((k,1))
+            dist_vec = np.zeros((k, 1))
             # for each centroid
             for index_prototype, prototype in enumerate(prototypes):
                 # compute the distance between x and centroid
@@ -54,7 +53,10 @@ def kmeans(k, epsilon=0, distance='euclidian'):
         # for each cluster (k of them)
         for index in range(len(prototypes)):
             # get all the points assigned to a cluster
-            instances_close = [i for i in range(len(belongs_to)) if belongs_to[i] == index]
+            instances_close = [
+                    i for i in range(len(belongs_to))
+                    if belongs_to[i] == index
+                    ]
             # find the mean of those points, this is our new centroid
             prototype = np.mean(dataset[instances_close], axis=0)
             # add our new centroid to our new temporary list
